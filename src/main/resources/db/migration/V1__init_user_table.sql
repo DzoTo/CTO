@@ -9,6 +9,3 @@ CREATE TABLE IF NOT EXISTS users (
     );
 
 ALTER SEQUENCE IF EXISTS user_id_sequence OWNED BY users.id;
-
-INSERT INTO users (username, password, role)
-VALUES ('admin', '$2a$10$Fj8tPl2dOsyFQeU2ZqUjR.jvtxQv93rIaCVLuBtb0rZnHzlLVkwSG', 'ROLE_ADMIN');
