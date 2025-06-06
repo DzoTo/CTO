@@ -16,9 +16,22 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
 
     @Query(
             nativeQuery = true,
-            value = "SELECT * FROM request WHERE user_id = :userId AND status != 500",
-            countQuery = "SELECT count(*) FROM request WHERE user_id = :userId AND status != 500"
+            value = "SELECT * FROM requests WHERE user_id = :userId AND status != 500",
+            countQuery = "SELECT count(*) FROM requests WHERE user_id = :userId AND status != 500"
     )
     Page<Request> findAllAccepted(@Param("userId") Long userId, Pageable pageable);
 
+    @Query(
+            nativeQuery = true,
+            value = "SELECT * FROM requests WHERE user_id = :userId AND status = 500",
+            countQuery = "SELECT count(*) FROM requests WHERE user_id = :userId AND status = 500"
+    )
+    Page<Request> findAllRejected(@Param("userId") Long userId, Pageable pageable);
+
+    @Query(
+            nativeQuery = true,
+            value = "SELECT * FROM requests WHERE user_id = :userId AND status != 500",
+            countQuery = "SELECT count(*) FROM requests WHERE user_id = :userId"
+    )
+    Page<Request> findAllByUserId(@Param("userId") Long userId, Pageable pageable);
 }

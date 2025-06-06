@@ -21,10 +21,10 @@ public class CtoApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		User user = new User();
-		user.setUsername("admin");
-		user.setPassword(bCryptPasswordEncoder.encode("admin"));
-		user.setRole(UserRole.ROLE_ADMIN);
-		userRepository.save(user);
+//		User user = new User();
+//		user.setUsername("admin");
+//		user.setPassword(bCryptPasswordEncoder.encode("admin"));
+//		user.setRole(UserRole.ROLE_ADMIN);
+//		userRepository.save(user);
 	}
 }

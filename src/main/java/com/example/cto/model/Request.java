@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -45,6 +46,7 @@ public class Request {
                 .status(RequestStatus.ACCEPTED)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
+                .history(new ArrayList<>())
                 .build();
     }
 }

@@ -13,9 +13,15 @@ import java.util.List;
 public class CustomUserDetails implements UserDetails {
 
     private final User user;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(user.getRole().name()));
+        // Add ROLE_ prefix for Spring Security compatibility
+        String roleName = user.getRole().name();
+        if (!roleName.startsWith("ROLE_")) {
+            roleName = "ROLE_" + roleName;
+        }
+        return List.of(new SimpleGrantedAuthority(roleName));
     }
 
     @Override

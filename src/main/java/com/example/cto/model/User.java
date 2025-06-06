@@ -4,6 +4,7 @@ import com.example.cto.model.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -24,5 +25,5 @@ public class User {
     private UserRole role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Request> requests;
+    private List<Request> requests = new ArrayList<>();
 }

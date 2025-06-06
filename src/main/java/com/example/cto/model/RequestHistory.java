@@ -31,11 +31,11 @@ public class RequestHistory {
 
     private LocalDateTime updatedAt;
 
-    public static RequestHistory build(Request request, String msg, String changedStatus, String worker) {
+    public static RequestHistory build(Request request, String msg) {
         return RequestHistory.builder()
                 .message(msg)
-                .status(RequestStatus.fromValue(changedStatus))
-                .workerName(worker)
+                .status(RequestStatus.ACCEPTED)
+                .workerName("Responsible person is not assigned yet")
                 .request(request)
                 .updatedAt(LocalDateTime.now())
                 .build();

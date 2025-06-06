@@ -1,6 +1,8 @@
 package com.example.cto.service.impl;
 
+import com.example.cto.model.Request;
 import com.example.cto.model.RequestHistory;
+import com.example.cto.model.enums.RequestStatus;
 import com.example.cto.repository.RequestHistoryRepository;
 import com.example.cto.repository.RequestRepository;
 import com.example.cto.repository.UserRepository;
@@ -17,12 +19,9 @@ public class RequestHistoryServiceImpl implements RequestHistoryService {
     private final RequestRepository requestRepository;
     private final RequestHistoryRepository requestHistoryRepository;
 
+    private static final String INIT_MESSAGE = "Request has been accepted";
     @Override
-    public void createRequestHistory(Authentication authentication, String status) {
-        var username = authentication.getName();
-        var user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("No user found"));
-        var request = requestRepository.findById()
-        var requestHistory = RequestHistory.build(user.getUsername())
+    public RequestHistory createInitialRequestHistory(Request request) {
+        return RequestHistory.build(request, INIT_MESSAGE);
     }
 }

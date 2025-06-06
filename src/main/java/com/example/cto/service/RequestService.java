@@ -8,5 +8,7 @@ import org.springframework.security.core.Authentication;
 
 public interface RequestService {
     void createRequest(RequestCreate requestCreate, Authentication authentication);
-    Page<RequestResponse> getAllRequests(Authentication authentication, Pageable pageable);
+    Page<RequestResponse> getAllNonRejectedRequests(Authentication authentication, Pageable pageable);
+    Page<RequestResponse> getArchivedRequest(Authentication authentication, Pageable pageable);
+    Page<RequestResponse> getAllRequestOfUser(Long id, Authentication authentication, Pageable pageable);
 }
