@@ -26,7 +26,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true) // Enable @PreAuthorize and @PostAuthorize
+@EnableMethodSecurity(prePostEnabled = true)
 @EnableCaching
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -67,7 +67,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(12); // Increased strength
+        return new BCryptPasswordEncoder(); // Increased strength
     }
 
     @Bean

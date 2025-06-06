@@ -24,7 +24,8 @@ public class CtoApplication implements CommandLineRunner {
 //		User user = new User();
 //		user.setUsername("admin");
 //		user.setPassword(bCryptPasswordEncoder.encode("admin"));
-//		user.setRole(UserRole.ROLE_ADMIN);
-//		userRepository.save(user);
+//		System.out.println(user.getPassword());
+////		user.setRole(UserRole.ROLE_ADMIN);
+////		userRepository.save(user);
 	}
 }

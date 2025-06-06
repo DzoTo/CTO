@@ -1,5 +1,7 @@
 package com.example.cto.service.impl;
 
+import com.example.cto.dto.RequestHistoryResponse;
+import com.example.cto.mapper.Mapper;
 import com.example.cto.model.Request;
 import com.example.cto.model.RequestHistory;
 import com.example.cto.model.enums.RequestStatus;
@@ -7,9 +9,14 @@ import com.example.cto.repository.RequestHistoryRepository;
 import com.example.cto.repository.RequestRepository;
 import com.example.cto.repository.UserRepository;
 import com.example.cto.service.RequestHistoryService;
+import com.example.cto.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -17,7 +24,9 @@ public class RequestHistoryServiceImpl implements RequestHistoryService {
 
     private final UserRepository userRepository;
     private final RequestRepository requestRepository;
+    private final UserService userService;
     private final RequestHistoryRepository requestHistoryRepository;
+    private final Mapper mapper;
 
     private static final String INIT_MESSAGE = "Request has been accepted";
     private static final String START_MESSAGE = "Responsible person started to work on your request";
@@ -62,6 +71,25 @@ public class RequestHistoryServiceImpl implements RequestHistoryService {
         request.setStatus(RequestStatus.REJECTED);
         requestRepository.save(request);
     }
+
+    @Override
+    public Page<RequestHistoryResponse> getHistoryByUserId(Long requestId,
+                                                           Authentication authentication,
+                                                           Pageable pageable) {
+        var user = userService.findByUsername(getUsername(authentication))
+                .orElseThrow(() -> new RuntimeException("No user found"));
+
+        boolean hasAccess = user.getRequests().stream()
+                .anyMatch(request -> Objects.equals(request.getId(), requestId));
+
+        if (!hasAccess) {
+            throw new IllegalArgumentException("You do not have permission to view this request");
+        }
+
+        var histories = requestHistoryRepository.findAllByRequestId(requestId, pageable);
+        return histories.map(mapper::mapRequestHistoryToDto);
+    }
+
 
     private Request getRequest(Long requestId) {
         return requestRepository.findById(requestId)

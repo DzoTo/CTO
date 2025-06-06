@@ -1,7 +1,9 @@
 package com.example.cto.controller;
 
 import com.example.cto.dto.RequestCreate;
+import com.example.cto.dto.RequestCreateWithUser;
 import com.example.cto.dto.RequestResponse;
+import com.example.cto.kafka.RequestProducer;
 import com.example.cto.service.RequestService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,13 +21,18 @@ import org.springframework.web.bind.annotation.*;
 public class RequestController {
 
     private final RequestService requestService;
+    private final RequestProducer requestProducer;
 
     @PostMapping("/new")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<String> createNewRequest(@RequestBody RequestCreate requestCreate, Authentication authentication) {
         try {
-            requestService.createRequest(requestCreate, authentication);
-            return ResponseEntity.ok("Successfully created new request");
+            var username = authentication.getName();
+            RequestCreateWithUser payload = RequestCreateWithUser.builder()
+                    .username(username).requestCreate(requestCreate)
+                    .build();
+            requestProducer.sendRequest(payload);
+            return ResponseEntity.ok("Request has been successfully sent");
         }
         catch (Exception e) {
             return ResponseEntity.internalServerError().body(e.getMessage());

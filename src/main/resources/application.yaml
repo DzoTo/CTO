@@ -19,6 +19,21 @@ spring:
     enabled: true
     baseline-on-migrate: true
 
+  spring:
+    kafka:
+      bootstrap-servers: localhost:9092     # hostname from docker-compose service
+      consumer:
+        group-id: request-group
+        auto-offset-reset: earliest
+        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        properties:
+          spring.json.trusted.packages: '*'   # allow all packages, change for production
+      producer:
+        key-serializer: org.apache.kafka.common.serialization.StringSerializer
+        value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+
 
 jwt:
   secret: 'my_secret_key_which_should_be_very_long'
