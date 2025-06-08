@@ -6,7 +6,8 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 
 @Builder
-public record RequestResponse(String title,
+public record RequestResponse(Long id,
+                              String title,
                               String description,
                               RequestStatus status,
                               LocalDateTime createdAt) {

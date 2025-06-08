@@ -7,10 +7,11 @@ import com.example.cto.model.RequestHistory;
 import com.example.cto.model.enums.RequestStatus;
 import com.example.cto.repository.RequestHistoryRepository;
 import com.example.cto.repository.RequestRepository;
-import com.example.cto.repository.UserRepository;
+import com.example.cto.service.MailService;
 import com.example.cto.service.RequestHistoryService;
 import com.example.cto.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -19,10 +20,11 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class RequestHistoryServiceImpl implements RequestHistoryService {
 
-    private final UserRepository userRepository;
+    private final MailService mailService;
     private final RequestRepository requestRepository;
     private final UserService userService;
     private final RequestHistoryRepository requestHistoryRepository;
@@ -48,6 +50,8 @@ public class RequestHistoryServiceImpl implements RequestHistoryService {
         request.getHistory().add(history);
         request.setStatus(RequestStatus.IN_PROGRESS);
         requestRepository.save(request);
+        sendMail(request.getContactEmail(), request.getTitle(), START_MESSAGE);
+        log.info("Worker started to work on request, notification has been sent to contact email");
     }
 
     @Override
@@ -59,6 +63,8 @@ public class RequestHistoryServiceImpl implements RequestHistoryService {
         request.getHistory().add(history);
         request.setStatus(RequestStatus.SUCCESS);
         requestRepository.save(request);
+        sendMail(request.getContactEmail(), request.getTitle(), SUCCESS);
+        log.info("Worker finished works on request, notification has been sent to contact email");
     }
 
     @Override
@@ -70,6 +76,8 @@ public class RequestHistoryServiceImpl implements RequestHistoryService {
         request.getHistory().add(history);
         request.setStatus(RequestStatus.REJECTED);
         requestRepository.save(request);
+        sendMail(request.getContactEmail(), request.getTitle(), REJECT_MESSAGE);
+        log.info("Worker rejected request, notification has been sent to contact email");
     }
 
     @Override
@@ -86,16 +94,25 @@ public class RequestHistoryServiceImpl implements RequestHistoryService {
             throw new IllegalArgumentException("You do not have permission to view this request");
         }
 
-        var histories = requestHistoryRepository.findAllByRequestId(requestId, pageable);
-        return histories.map(mapper::mapRequestHistoryToDto);
+        return getHistoryByAdmin(requestId, authentication, pageable);
     }
+
+    @Override
+    public Page<RequestHistoryResponse> getHistoryByAdmin(Long requestId, Authentication authentication, Pageable pageable) {
+        var histories = requestHistoryRepository.findAllByRequestId(requestId, pageable);
+        return histories.map(mapper::mapRequestHistoryToDto);    }
 
 
     private Request getRequest(Long requestId) {
         return requestRepository.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("No such request"));
     }
+
     private String getUsername(Authentication authentication) {
         return authentication.getName();
+    }
+
+    private void sendMail(String to, String subject, String content) {
+        mailService.sendSimpleEmail(to, subject, content);
     }
 }

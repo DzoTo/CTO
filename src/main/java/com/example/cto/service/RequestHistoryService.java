@@ -14,4 +14,5 @@ public interface RequestHistoryService {
     void finishWork(Long requestId, Authentication authentication);
     void rejectWork(Long requestId, Authentication authentication);
     Page<RequestHistoryResponse> getHistoryByUserId(Long userId, Authentication authentication, Pageable pageable);
+    Page<RequestHistoryResponse> getHistoryByAdmin(Long userId, Authentication authentication, Pageable pageable);
 }

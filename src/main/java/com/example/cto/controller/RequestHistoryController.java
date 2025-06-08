@@ -54,9 +54,23 @@ public class RequestHistoryController {
         }
     }
 
-    @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+    @GetMapping("/{id}/admin")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Page<RequestHistoryResponse>> getRequests(
+            @PathVariable("id") Long requestId,
+            Authentication authentication, Pageable pageable) {
+        try {
+            var requests = requestHistoryService.getHistoryByAdmin(requestId, authentication, pageable);
+            return ResponseEntity.ok(requests);
+        } catch (Exception e){
+            log.error(e.getMessage());
+            return ResponseEntity.internalServerError().body(null);
+        }
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<Page<RequestHistoryResponse>> getRequestsByUser(
             @PathVariable("id") Long requestId,
             Authentication authentication, Pageable pageable) {
         try {

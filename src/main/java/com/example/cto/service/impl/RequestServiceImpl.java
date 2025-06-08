@@ -1,6 +1,5 @@
 package com.example.cto.service.impl;
 
-import com.example.cto.dto.RequestCreate;
 import com.example.cto.dto.RequestCreateWithUser;
 import com.example.cto.dto.RequestResponse;
 import com.example.cto.mapper.Mapper;
@@ -8,6 +7,7 @@ import com.example.cto.model.Request;
 import com.example.cto.model.User;
 import com.example.cto.repository.RequestRepository;
 import com.example.cto.repository.UserRepository;
+import com.example.cto.service.MailService;
 import com.example.cto.service.RequestHistoryService;
 import com.example.cto.service.RequestService;
 import lombok.RequiredArgsConstructor;
@@ -21,10 +21,13 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 public class RequestServiceImpl implements RequestService {
+    private final MailService mailService;
     private final UserRepository userRepository;
     private final RequestRepository requestRepository;
     private final Mapper mapper;
     private final RequestHistoryService requestHistoryService;
+
+    private static final String INIT_MESSAGE = "Request has been accepted";
 
     @Override
     public void createRequest(RequestCreateWithUser requestCreateWithUser) {
@@ -33,7 +36,8 @@ public class RequestServiceImpl implements RequestService {
         var reqHist = requestHistoryService.createInitialRequestHistory(request);
         request.getHistory().add(reqHist);
         requestRepository.save(request);
-        log.info("Request has been created");
+        mailService.sendSimpleEmail(request.getContactEmail(), request.getTitle(), INIT_MESSAGE);
+        log.info("Request has been created, notification has been sent to contact email");
     }
 
     @Override
@@ -53,7 +57,7 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public Page<RequestResponse> getAllRequestOfUser(Long id, Authentication authentication, Pageable pageable) {
         var user = userRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("No such user with id"));
+                .orElseThrow(() -> new RuntimeException("No such user with id"));
         var requests = requestRepository.findAllByUserId(user.getId(), pageable);
         return requests.map(mapper::mapRequestToDto);
     }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 public class Mapper {
     public RequestResponse mapRequestToDto(Request request) {
         return RequestResponse.builder()
+                .id(request.getId())
                 .title(request.getTitle())
                 .status(request.getStatus())
                 .createdAt(request.getCreatedAt())
